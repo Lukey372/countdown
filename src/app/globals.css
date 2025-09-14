@@ -1,74 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #0B0B0B;
-  --foreground: #ffffff;
+/* Animated background: two radial orange glows + dark gradient */
+.bg-radr {
+  background-image:
+    radial-gradient(1000px 600px at 35% 35%, rgba(255,106,0,0.18), transparent 60%),
+    radial-gradient(800px 480px at 70% 65%, rgba(255,106,0,0.12), transparent 60%),
+    linear-gradient(120deg, #0B0B0B, #171717 40%, #0B0B0B 80%);
+  background-size: cover, cover, 300% 300%;
+  animation: drift 28s ease-in-out infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-mono: 'Inter', system-ui, sans-serif;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Inter', system-ui, sans-serif;
-  overflow-x: hidden;
-}
-
-/* Custom animations */
-@keyframes radiate {
-  0%, 100% { 
-    opacity: 0.3; 
-    transform: scale(1); 
+/* Subtle tick movement on digit change (no layout shift) */
+@media (prefers-reduced-motion: no-preference) {
+  .digit-tick {
+    transition: transform 120ms ease, opacity 120ms ease;
   }
-  50% { 
-    opacity: 0.6; 
-    transform: scale(1.05); 
-  }
-}
-
-@keyframes floatGlow {
-  0%, 100% { 
-    transform: translateY(0px); 
-  }
-  50% { 
-    transform: translateY(-2px); 
-  }
-}
-
-/* Glass morphism effect */
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid #2A2A2A;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-/* Tabular numbers for countdown */
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+  .digit-tick[data-tick="1"] { transform: translateY(-1px); opacity: .98; }
 }
