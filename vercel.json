@@ -1,0 +1,5 @@
+{
+  "output": "static",
+  "trailingSlash": true,
+  "cleanUrls": true
+}
