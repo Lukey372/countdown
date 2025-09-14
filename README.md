@@ -34,11 +34,8 @@ npm install
 # Run development server
 npm run dev
 
-# Build for production
+# Build for production (creates static export)
 npm run build
-
-# Export static files
-npm run export
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the countdown page.
