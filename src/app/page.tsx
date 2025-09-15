@@ -10,6 +10,7 @@ export default function Page() {
           <div className="flex items-center gap-4">
           <Logo />
         </div>
+        </div>
       </nav>
 
       {/* Main content with top padding for fixed nav */}
@@ -18,6 +19,4 @@ export default function Page() {
       </div>
     </main>
   );
-}
-  )
 }
