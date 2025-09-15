@@ -14,6 +14,7 @@ function fmtTwo(n: number) { return n.toString().padStart(2, "0"); }
 
 export default function Countdown() {
   const [now, setNow] = useState(DateTime.now());
+  const [prevValues, setPrevValues] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const state: State = now < openAt ? "PRE_OPEN" : now <= closeAt ? "OPEN" : "CLOSED";
   const target = state === "PRE_OPEN" ? openAt : state === "OPEN" ? closeAt : null;
 
@@ -32,6 +33,11 @@ export default function Countdown() {
   const hours = delta.hours ?? 0;
   const minutes = delta.minutes ?? 0;
   const seconds = Math.floor(delta.seconds ?? 0);
+
+  // Track value changes for flip animation
+  useEffect(() => {
+    setPrevValues({ days, hours, minutes, seconds });
+  }, [days, hours, minutes, seconds]);
 
   const progress = useMemo(() => {
     if (state !== "OPEN") return 0;
@@ -54,100 +60,115 @@ export default function Countdown() {
     state === "PRE_OPEN" ? "OPENS IN" : state === "OPEN" ? "OPEN NOW" : "CLOSED";
 
   return (
-    <section aria-label="Migration countdown" className="relative w-full">
-      {/* glow */}
+    <section aria-label="Migration countdown" className="relative w-full particles">
+      {/* Enhanced background glow */}
       <div
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[60vmin] w-[60vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-radr-orange/25 blur-3xl animate-radiate"
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[80vmin] w-[80vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-radial from-radr-orange/30 via-radr-orange/10 to-transparent blur-3xl animate-radiate"
         aria-hidden
       />
-      {/* headline */}
-      <h1 className="text-center text-white font-extrabold leading-tight tracking-tight
-                     text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
-        $TILT → $RADR Migration
-      </h1>
-      <p className="mt-3 text-center text-white/90 text-lg md:text-xl">{subline}</p>
+      
+      {/* Main headline with enhanced glow */}
+      <div className="text-center mb-8">
+        <h1 className="text-white font-black leading-tight tracking-tight text-glow stream-optimized
+                       text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl">
+          $TILT → $RADR Migration
+        </h1>
+        <p className="mt-4 text-white/90 font-medium text-xl md:text-2xl lg:text-3xl">
+          {subline}
+        </p>
+      </div>
 
-      {/* tiles */}
+      {/* Enhanced countdown tiles */}
       {state !== "CLOSED" && (
-        <div className="mt-8 flex items-stretch justify-center gap-4">
+        <div className="mt-12 flex items-stretch justify-center gap-6 md:gap-8">
           {[
-            { label: "D", val: days.toString().padStart(2, "0") },
-            { label: "H", val: fmtTwo(hours) },
-            { label: "M", val: fmtTwo(minutes) },
-            { label: "S", val: fmtTwo(seconds) },
-          ].map(({ label, val }) => (
+            { label: "DAYS", val: days.toString().padStart(2, "0"), prev: prevValues.days },
+            { label: "HOURS", val: fmtTwo(hours), prev: prevValues.hours },
+            { label: "MINUTES", val: fmtTwo(minutes), prev: prevValues.minutes },
+            { label: "SECONDS", val: fmtTwo(seconds), prev: prevValues.seconds },
+          ].map(({ label, val, prev }) => (
             <div
               key={label}
-              className="digit-tick grid min-w-[110px] place-items-center rounded-2xl
-                         border border-radr-line/80 bg-white/5 backdrop-blur-md shadow-glass
-                         px-6 py-6 md:px-8 md:py-8"
-              data-tick="1"
-              aria-label={`${label} remaining`}
+              className="glass-container orange-glow digit-flip grid min-w-[120px] md:min-w-[140px] lg:min-w-[160px] place-items-center rounded-3xl
+                         px-6 py-8 md:px-8 md:py-10 lg:px-10 lg:py-12
+                         hover:scale-105 transition-transform duration-300"
+              style={{ animationDelay: `${Math.random() * 2}s` }}
+              aria-label={`${val} ${label.toLowerCase()} remaining`}
             >
-              <div className="text-white font-extrabold tabular-nums
-                              text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
+              <div className="text-white font-black tabular-nums text-glow
+                              text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
                 {val}
               </div>
-              <div className="mt-1 text-xs tracking-[0.28em] text-radr-slate">{label}</div>
+              <div className="mt-2 text-xs md:text-sm tracking-[0.3em] text-radr-orange/80 font-semibold uppercase">
+                {label}
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* state pill */}
-      <div className="mt-4 flex justify-center">
+      {/* Enhanced state pill */}
+      <div className="mt-8 flex justify-center">
         <span
           className={
-            "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs tracking-wide " +
+            "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold tracking-wide uppercase " +
             (state === "OPEN"
-              ? "border-radr-orange/70 text-white bg-radr-orange/15 animate-pulseBadge"
+              ? "border-radr-orange/70 text-white bg-radr-orange/20 orange-glow animate-pulse"
               : state === "PRE_OPEN"
-              ? "border-white/30 text-white/80"
-              : "border-white/20 text-white/50")
+              ? "border-white/40 text-white/90 bg-white/5"
+              : "border-white/20 text-white/50 bg-white/5")
           }
         >
+          {state === "OPEN" && (
+            <div className="w-2 h-2 bg-radr-orange rounded-full animate-pulse" />
+          )}
           {pill}
         </span>
       </div>
 
-      {/* progress bar */}
+      {/* Enhanced progress bar */}
       {state === "OPEN" && (
-        <div className="mx-auto mt-6 w-[min(720px,92vw)]">
-          <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+        <div className="mx-auto mt-8 w-[min(800px,90vw)]">
+          <div className="glass-container h-2 w-full rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-radr-orange/80 to-white/80"
+              className="h-full bg-gradient-to-r from-radr-orange via-orange-400 to-radr-orange animate-pulse"
               style={{ width: `${progress * 100}%` }}
               aria-hidden
             />
           </div>
-          <div className="mt-1 text-center text-xs text-white/60">
-            {Math.round(progress * 100)}% of window elapsed
+          <div className="mt-2 text-center text-sm font-medium text-radr-orange/80">
+            {Math.round(progress * 100)}% of migration window elapsed
           </div>
         </div>
       )}
 
-      {/* open/close timestamps */}
-      <div className="mx-auto mt-6 w-[min(920px,95vw)] text-center text-sm text-white/80">
-        <div>
-          Opening: Sep 23, 2025 12:00 PM ET • Your local:{" "}
-          {openingLocal.toFormat("LLL d, yyyy h:mm a ZZZZ")}
-        </div>
-        <div>
-          Closing: Sep 30, 2025 12:00 PM ET • Your local:{" "}
-          {closingLocal.toFormat("LLL d, yyyy h:mm a ZZZZ")}
+      {/* Enhanced timestamp details */}
+      <div className="mx-auto mt-12 w-[min(1000px,95vw)] text-center space-y-2">
+        <div className="glass-container rounded-2xl px-6 py-4 text-white/90 font-medium">
+          <div className="text-base md:text-lg">
+            <span className="text-radr-orange font-semibold">Opening:</span> Sep 23, 2025 12:00 PM ET
+            <span className="mx-4 text-white/50">•</span>
+            <span className="text-white/80">Your local:</span> {openingLocal.toFormat("LLL d, yyyy h:mm a ZZZZ")}
+          </div>
+          <div className="text-base md:text-lg mt-2">
+            <span className="text-radr-orange font-semibold">Closing:</span> Sep 30, 2025 12:00 PM ET
+            <span className="mx-4 text-white/50">•</span>
+            <span className="text-white/80">Your local:</span> {closingLocal.toFormat("LLL d, yyyy h:mm a ZZZZ")}
+          </div>
         </div>
       </div>
 
-      {/* CTA (open only) */}
+      {/* Enhanced CTA */}
       {state === "OPEN" && (
-        <div className="mt-8 flex justify-center">
+        <div className="mt-10 flex justify-center">
           <a
             href="https://radr.fun?utm_source=countdown&utm_medium=landing&utm_campaign=tilt_to_radr"
             target="_blank"
-            className="rounded-2xl bg-radr-orange text-black font-semibold px-6 py-3 hover:opacity-95
-                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-radr-orange"
+            className="glass-container rounded-2xl bg-gradient-to-r from-radr-orange to-orange-500 text-black font-bold text-lg
+                       px-8 py-4 hover:scale-105 hover:shadow-2xl transition-all duration-300
+                       focus:outline-none focus:ring-4 focus:ring-radr-orange/50"
           >
-            Start Migration
+            Start Migration Now
           </a>
         </div>
       )}
