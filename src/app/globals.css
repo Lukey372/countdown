@@ -3,33 +3,96 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Enhanced animated background with radar-style gradient and pulsating orange glow */
+/* Premium glassmorphism background with animated radar sweep */
 .bg-radr {
-  background-image:
-    /* Main orange glow spotlight behind countdown */
-    radial-gradient(1200px 800px at 50% 45%, rgba(255,106,0,0.25), transparent 65%),
-    /* Secondary glow for depth */
-    radial-gradient(800px 600px at 30% 70%, rgba(255,106,0,0.15), transparent 70%),
-    /* Radar sweep effect */
-    conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(255,106,0,0.08) 45deg, transparent 90deg, transparent 270deg, rgba(255,106,0,0.05) 315deg, transparent 360deg),
+  background: 
+    /* Animated radar sweep */
+    conic-gradient(from 0deg at 50% 50%, 
+      transparent 0deg, 
+      rgba(255,106,0,0.03) 30deg, 
+      transparent 60deg, 
+      transparent 300deg, 
+      rgba(255,106,0,0.02) 330deg, 
+      transparent 360deg),
+    /* Main orange glow spotlight */
+    radial-gradient(1400px 900px at 50% 40%, 
+      rgba(255,106,0,0.15), 
+      rgba(255,106,0,0.08) 40%, 
+      transparent 70%),
+    /* Secondary depth glow */
+    radial-gradient(800px 600px at 25% 75%, 
+      rgba(255,106,0,0.06), 
+      transparent 60%),
     /* Base gradient */
-    linear-gradient(135deg, #000000 0%, #111111 25%, #222222 50%, #111111 75%, #000000 100%);
+    linear-gradient(135deg, 
+      #000000 0%, 
+      #0a0a0a 25%, 
+      #1a1a1a 50%, 
+      #0f0f0f 75%, 
+      #000000 100%);
   background-size: 
+    300% 300%,
     100% 100%,
-    100% 100%, 
-    200% 200%,
-    400% 400%;
-  background-position: 
-    center center,
-    center center,
-    center center,
-    0% 50%;
+    100% 100%,
+    200% 200%;
   animation: 
-    radarSweep 8s linear infinite,
-    backgroundDrift 20s ease-in-out infinite;
+    radarSweep 12s linear infinite,
+    backgroundPulse 8s ease-in-out infinite,
+    backgroundDrift 25s ease-in-out infinite;
 }
 
-/* Smooth flip animation for countdown digits */
+/* Premium glassmorphism container */
+.glass-container {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 106, 0, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(255, 106, 0, 0.08);
+}
+
+/* Enhanced glass tiles for countdown digits */
+.glass-tile {
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 106, 0, 0.2);
+  box-shadow: 
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    0 1px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 20px rgba(255, 106, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.glass-tile:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(255, 106, 0, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 30px rgba(255, 106, 0, 0.2);
+}
+
+/* Premium text glow effects */
+.text-glow {
+  text-shadow: 
+    0 0 20px rgba(255, 106, 0, 0.4),
+    0 0 40px rgba(255, 106, 0, 0.2),
+    0 0 60px rgba(255, 106, 0, 0.1);
+}
+
+.text-glow-subtle {
+  text-shadow: 
+    0 0 10px rgba(255, 106, 0, 0.3),
+    0 0 20px rgba(255, 106, 0, 0.15);
+}
+
+/* Smooth flip animation for digits */
 @media (prefers-reduced-motion: no-preference) {
   .digit-flip {
     transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
@@ -47,89 +110,78 @@
   }
 }
 
-/* Glassmorphism enhancement */
-.glass-container {
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 106, 0, 0.2);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 0 0 1px rgba(255, 106, 0, 0.1);
-}
-
-/* Enhanced glow effects */
-.text-glow {
-  text-shadow: 
-    0 0 10px rgba(255, 106, 0, 0.3),
-    0 0 20px rgba(255, 106, 0, 0.2),
-    0 0 40px rgba(255, 106, 0, 0.1);
-}
-
-.orange-glow {
-  box-shadow: 
-    0 0 20px rgba(255, 106, 0, 0.4),
-    0 0 40px rgba(255, 106, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-/* Particle drift animation */
+/* Floating particles for ambient depth */
 .particles::before,
 .particles::after {
   content: '';
   position: absolute;
-  width: 2px;
-  height: 2px;
-  background: rgba(255, 106, 0, 0.6);
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 106, 0, 0.4);
   border-radius: 50%;
-  animation: particleDrift 15s linear infinite;
+  animation: particleDrift 20s linear infinite;
+  pointer-events: none;
 }
 
 .particles::before {
-  top: 20%;
-  left: 10%;
-  animation-delay: -5s;
+  top: 15%;
+  left: 8%;
+  animation-delay: -7s;
+  animation-duration: 18s;
 }
 
 .particles::after {
-  top: 60%;
-  right: 15%;
-  animation-delay: -10s;
-  animation-duration: 20s;
+  top: 70%;
+  right: 12%;
+  animation-delay: -14s;
+  animation-duration: 22s;
 }
 
-/* Keyframe animations */
+/* Enhanced keyframe animations */
 @keyframes radarSweep {
   0% { 
-    background-position: center center, center center, 0% 0%, 0% 50%; 
+    background-position: 0% 0%, center center, center center, 0% 50%; 
   }
   100% { 
-    background-position: center center, center center, 100% 100%, 100% 50%; 
+    background-position: 100% 100%, center center, center center, 100% 50%; 
+  }
+}
+
+@keyframes backgroundPulse {
+  0%, 100% { 
+    filter: brightness(1) contrast(1); 
+  }
+  50% { 
+    filter: brightness(1.05) contrast(1.02); 
   }
 }
 
 @keyframes backgroundDrift {
   0%, 100% { 
-    background-position: center center, center center, 0% 0%, 0% 50%; 
+    background-position: 0% 0%, center center, center center, 0% 50%; 
   }
-  50% { 
-    background-position: center center, center center, 50% 50%, 100% 50%; 
+  33% { 
+    background-position: 33% 33%, center center, center center, 33% 50%; 
+  }
+  66% { 
+    background-position: 66% 66%, center center, center center, 66% 50%; 
   }
 }
 
 @keyframes particleDrift {
   0% { 
-    transform: translateY(0px) translateX(0px); 
+    transform: translateY(0px) translateX(0px) scale(0); 
     opacity: 0; 
   }
   10% { 
     opacity: 1; 
+    transform: scale(1); 
   }
   90% { 
     opacity: 1; 
   }
   100% { 
-    transform: translateY(-100px) translateX(50px); 
+    transform: translateY(-120px) translateX(60px) scale(0); 
     opacity: 0; 
   }
 }
@@ -137,33 +189,52 @@
 @keyframes pulseGlow {
   0%, 100% { 
     box-shadow: 
-      0 0 20px rgba(255, 106, 0, 0.4),
-      0 0 40px rgba(255, 106, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      0 4px 24px rgba(0, 0, 0, 0.3),
+      0 1px 4px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 0 20px rgba(255, 106, 0, 0.1);
   }
   50% { 
     box-shadow: 
-      0 0 30px rgba(255, 106, 0, 0.6),
-      0 0 60px rgba(255, 106, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      0 6px 32px rgba(0, 0, 0, 0.4),
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 30px rgba(255, 106, 0, 0.2);
   }
 }
 
-/* Enhanced radiate animation */
+/* Enhanced radiate animation for background glow */
 @keyframes radiate {
   0%, 100% { 
     transform: translate(-50%, -50%) scale(1); 
-    opacity: 0.6; 
+    opacity: 0.4; 
   }
   50% { 
-    transform: translate(-50%, -50%) scale(1.1); 
-    opacity: 0.8; 
+    transform: translate(-50%, -50%) scale(1.15); 
+    opacity: 0.6; 
   }
 }
 
-/* Responsive optimizations for streaming */
+/* Stream optimization for high-resolution displays */
 @media (min-width: 1920px) {
   .stream-optimized {
     font-size: 1.1em;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .bg-radr {
+    animation: none;
+  }
+  
+  .glass-tile {
+    transition: none;
+  }
+  
+  .particles::before,
+  .particles::after {
+    animation: none;
   }
 }
