@@ -9,7 +9,6 @@ const openAt = DateTime.fromObject({ year: 2025, month: 9, day: 23, hour: 12 }, 
 const closeAt = DateTime.fromObject({ year: 2025, month: 9, day: 30, hour: 12 }, { zone: ET });
 
 function clamp01(n: number) { return Math.max(0, Math.min(1, n)); }
-
 function fmtTwo(n: number) { return n.toString().padStart(2, "0"); }
 
 export default function Countdown() {
@@ -17,6 +16,7 @@ export default function Countdown() {
   const [isClient, setIsClient] = useState(false);
   const [prevValues, setPrevValues] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [flippingDigits, setFlippingDigits] = useState({ days: false, hours: false, minutes: false, seconds: false });
+  
   const state: State = now < openAt ? "PRE_OPEN" : now <= closeAt ? "OPEN" : "CLOSED";
   const target = state === "PRE_OPEN" ? openAt : state === "OPEN" ? closeAt : null;
 
@@ -49,10 +49,9 @@ export default function Countdown() {
     
     setFlippingDigits(newFlipping);
     
-    // Reset flipping state after animation
     const timer = setTimeout(() => {
       setFlippingDigits({ days: false, hours: false, minutes: false, seconds: false });
-    }, 800);
+    }, 600);
     
     setPrevValues({ days, hours, minutes, seconds });
     
@@ -71,128 +70,130 @@ export default function Countdown() {
 
   const subline =
     state === "PRE_OPEN"
-      ? "Opens Sep 23, 2025 • 12:00 PM ET"
+      ? "Opens September 23, 2025 at 12:00 PM ET"
       : state === "OPEN"
-      ? "Closes Sep 30, 2025 • 12:00 PM ET"
+      ? "Closes September 30, 2025 at 12:00 PM ET"
       : "Migration window has closed";
 
   const pill =
     state === "PRE_OPEN" ? "OPENS IN" : state === "OPEN" ? "OPEN NOW" : "CLOSED";
 
+  const pillClass =
+    state === "OPEN" ? "state-pill-open" : state === "PRE_OPEN" ? "state-pill-pre" : "state-pill-closed";
+
   return (
-    <section aria-label="Migration countdown" className="relative w-full particles flex flex-col items-center justify-center py-16 md:py-24">
-      {/* Cinematic background glow with enhanced depth */}
-      <div
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[120vmin] w-[120vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-radial from-radr-orange/25 via-radr-orange/12 to-transparent blur-3xl"
-        aria-hidden
-      />
+    <section aria-label="Migration countdown" className="relative w-full flex flex-col items-center justify-center py-12 md:py-16 lg:py-20">
       
-      {/* Cinematic headline with animated shine sweep */}
-      <div className="text-center mb-12">
-        <h1 className="text-white font-black leading-[0.85] tracking-tight text-glow-cinematic shine-sweep stream-optimized
-                       text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl 2xl:text-[10rem]">
-          $TILT → $RADR Migration
+      {/* Main headline - highly readable */}
+      <div className="text-center mb-8 md:mb-12">
+        <h1 className="text-readable font-black leading-tight tracking-tight stream-text
+                       text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl
+                       mb-4 md:mb-6">
+          <span className="text-glow-accent">$TILT</span>
+          <span className="text-white mx-2 md:mx-4">→</span>
+          <span className="text-glow-accent">$RADR</span>
         </h1>
-        <p className="mt-8 text-white/90 font-semibold text-xl md:text-2xl lg:text-3xl xl:text-4xl text-glow-subtle">
+        <h2 className="text-readable font-bold text-xl md:text-2xl lg:text-3xl xl:text-4xl">
+          Migration
+        </h2>
+        <p className="mt-4 md:mt-6 text-secondary font-medium text-lg md:text-xl lg:text-2xl">
           {subline}
         </p>
       </div>
 
-      {/* Premium 3D glassmorphism countdown container */}
+      {/* State indicator pill */}
+      <div className="mb-8 md:mb-12">
+        <span className={`inline-flex items-center gap-3 rounded-full px-6 py-3 md:px-8 md:py-4 
+                         text-base md:text-lg font-bold tracking-wide uppercase ${pillClass}`}>
+          {state === "OPEN" && (
+            <div className="w-3 h-3 bg-orange-500 rounded-full" 
+                 style={{ boxShadow: '0 0 10px rgba(255, 106, 0, 0.8)' }} />
+          )}
+          <span className="text-readable">{pill}</span>
+        </span>
+      </div>
+
+      {/* Countdown timer - high contrast */}
       {state !== "CLOSED" && (
-        <div className="glass-container rounded-3xl p-10 md:p-12 lg:p-16 mb-12">
-          <div className="flex items-stretch justify-center gap-6 md:gap-8 lg:gap-12">
+        <div className="glass-container rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-12 mb-8 md:mb-12">
+          <div className="grid grid-cols-4 gap-4 md:gap-6 lg:gap-8">
             {[
-              { label: "DAYS", val: days.toString().padStart(2, "0"), prev: prevValues.days },
-              { label: "HOURS", val: fmtTwo(hours), prev: prevValues.hours },
-              { label: "MINUTES", val: fmtTwo(minutes), prev: prevValues.minutes },
-              { label: "SECONDS", val: fmtTwo(seconds), prev: prevValues.seconds },
-            ].map(({ label, val, prev }, index) => {
-              const isFlipping = flippingDigits[label.toLowerCase() as keyof typeof flippingDigits];
+              { label: "DAYS", val: days.toString().padStart(2, "0"), key: "days" },
+              { label: "HOURS", val: fmtTwo(hours), key: "hours" },
+              { label: "MINUTES", val: fmtTwo(minutes), key: "minutes" },
+              { label: "SECONDS", val: fmtTwo(seconds), key: "seconds" },
+            ].map(({ label, val, key }) => {
+              const isFlipping = flippingDigits[key as keyof typeof flippingDigits];
               return (
-              <div
-                key={label}
-                className={`glass-tile digit-flip grid min-w-[120px] md:min-w-[140px] lg:min-w-[160px] xl:min-w-[180px] place-items-center rounded-2xl
-                           px-6 py-8 md:px-8 md:py-10 lg:px-10 lg:py-12 xl:px-12 xl:py-16
-                           cursor-default ${isFlipping ? 'flipping' : ''}`}
-                style={{ animationDelay: `${index * 0.15}s` }}
-                aria-label={`${val} ${label.toLowerCase()} remaining`}
-              >
-                <div className="text-white font-black tabular-nums text-glow
-                                text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl">
-                  {val}
+                <div
+                  key={label}
+                  className={`countdown-tile digit-flip rounded-xl md:rounded-2xl 
+                             p-4 md:p-6 lg:p-8 text-center min-w-[80px] md:min-w-[120px] lg:min-w-[140px]
+                             ${isFlipping ? 'flipping' : ''}`}
+                  aria-label={`${val} ${label.toLowerCase()} remaining`}
+                >
+                  <div className="text-readable font-black tabular-nums
+                                  text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+                    {val}
+                  </div>
+                  <div className="mt-2 md:mt-3 text-xs md:text-sm lg:text-base 
+                                  tracking-widest text-glow-accent font-bold uppercase">
+                    {label}
+                  </div>
                 </div>
-                <div className="mt-3 text-sm md:text-base lg:text-lg tracking-[0.3em] text-radr-orange/80 font-bold uppercase">
-                  {label}
-                </div>
-              </div>
               );
             })}
           </div>
         </div>
       )}
 
-      {/* Neon state indicator with pulse */}
-      <div className="mb-12">
-        <span
-          className={
-            "inline-flex items-center gap-3 rounded-full px-8 py-4 text-base font-bold tracking-wide uppercase " +
-            (state === "OPEN"
-              ? "neon-pill text-white"
-              : state === "PRE_OPEN"
-              ? "border-2 border-white/40 text-white/90 bg-white/10 backdrop-blur-sm"
-              : "border-2 border-white/30 text-white/60 bg-white/5 backdrop-blur-sm")
-          }
-        >
-          {state === "OPEN" && (
-            <div className="w-3 h-3 bg-radr-orange rounded-full shadow-lg" style={{
-              boxShadow: '0 0 10px rgba(255, 106, 0, 0.8), 0 0 20px rgba(255, 106, 0, 0.4)'
-            }} />
-          )}
-          {pill}
-        </span>
-      </div>
-
-      {/* Futuristic progress bar for open state */}
+      {/* Progress bar for open state */}
       {state === "OPEN" && (
-        <div className="w-[min(700px,85vw)] mb-12">
-          <div className="futuristic-progress h-4 w-full rounded-full">
+        <div className="w-full max-w-2xl mb-8 md:mb-12">
+          <div className="progress-container h-3 md:h-4 w-full rounded-full overflow-hidden">
             <div
               className="progress-fill h-full rounded-full transition-all duration-1000 ease-out"
               style={{ width: `${progress * 100}%` }}
               aria-hidden
             />
           </div>
-          <div className="mt-4 text-center text-base font-semibold text-radr-orange/90">
-            {Math.round(progress * 100)}% of migration window elapsed
+          <div className="mt-3 md:mt-4 text-center text-base md:text-lg font-semibold text-glow-accent">
+            {Math.round(progress * 100)}% Complete
           </div>
         </div>
       )}
 
-      {/* Premium frosted-glass panel for timestamps */}
-      <div className="w-[min(1000px,90vw)] mb-12">
-        <div className="glass-container rounded-2xl px-8 py-6 md:px-10 md:py-8 text-center space-y-4">
-          <div className="text-base md:text-lg lg:text-xl text-white/95 font-semibold">
-            <span className="text-radr-orange font-semibold">Opening:</span> Sep 23, 2025 12:00 PM ET
-            <span className="mx-4 text-white/50">•</span>
-            <span className="text-white/80">Your local:</span> {isClient ? openingLocal.toFormat("LLL d, yyyy h:mm a ZZZZ") : "Loading..."}
-          </div>
-          <div className="text-base md:text-lg lg:text-xl text-white/95 font-semibold">
-            <span className="text-radr-orange font-semibold">Closing:</span> Sep 30, 2025 12:00 PM ET
-            <span className="mx-4 text-white/50">•</span>
-            <span className="text-white/80">Your local:</span> {isClient ? closingLocal.toFormat("LLL d, yyyy h:mm a ZZZZ") : "Loading..."}
+      {/* Migration window details */}
+      <div className="w-full max-w-4xl mb-8 md:mb-12">
+        <div className="glass-container rounded-xl md:rounded-2xl px-6 py-4 md:px-8 md:py-6 text-center">
+          <div className="grid md:grid-cols-2 gap-4 md:gap-8 text-sm md:text-base lg:text-lg">
+            <div>
+              <span className="text-glow-accent font-semibold">Opens:</span>
+              <span className="text-secondary ml-2">Sep 23, 2025 12:00 PM ET</span>
+              <div className="text-xs md:text-sm text-secondary mt-1">
+                {isClient ? `Local: ${openingLocal.toFormat("LLL d, h:mm a ZZZZ")}` : "Loading local time..."}
+              </div>
+            </div>
+            <div>
+              <span className="text-glow-accent font-semibold">Closes:</span>
+              <span className="text-secondary ml-2">Sep 30, 2025 12:00 PM ET</span>
+              <div className="text-xs md:text-sm text-secondary mt-1">
+                {isClient ? `Local: ${closingLocal.toFormat("LLL d, h:mm a ZZZZ")}` : "Loading local time..."}
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Glossy CTA button for open state */}
+      {/* CTA button for open state */}
       {state === "OPEN" && (
         <div>
           <a
             href="https://radr.fun?utm_source=countdown&utm_medium=landing&utm_campaign=tilt_to_radr"
             target="_blank"
-            className="glossy-button rounded-2xl text-black font-bold text-xl
-                       px-12 py-5 focus:outline-none focus:ring-4 focus:ring-radr-orange/50"
+            rel="noopener noreferrer"
+            className="cta-button rounded-full font-bold text-lg md:text-xl
+                       px-8 py-4 md:px-12 md:py-5 focus:outline-none focus:ring-4 focus:ring-orange-500/50"
           >
             Start Migration Now
           </a>
