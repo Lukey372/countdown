@@ -13,12 +13,15 @@ function clamp01(n: number) { return Math.max(0, Math.min(1, n)); }
 function fmtTwo(n: number) { return n.toString().padStart(2, "0"); }
 
 export default function Countdown() {
-  const [now, setNow] = useState(DateTime.now());
+  const [now, setNow] = useState(DateTime.fromMillis(0, { zone: ET }));
+  const [isClient, setIsClient] = useState(false);
   const [prevValues, setPrevValues] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const state: State = now < openAt ? "PRE_OPEN" : now <= closeAt ? "OPEN" : "CLOSED";
   const target = state === "PRE_OPEN" ? openAt : state === "OPEN" ? closeAt : null;
 
   useEffect(() => {
+    setIsClient(true);
+    setNow(DateTime.now());
     const t = setInterval(() => setNow(DateTime.now()), 1000);
     return () => clearInterval(t);
   }, []);
@@ -46,8 +49,8 @@ export default function Countdown() {
     return clamp01(passed / total);
   }, [now, state]);
 
-  const openingLocal = openAt.setZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
-  const closingLocal = closeAt.setZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const openingLocal = isClient ? openAt.setZone(Intl.DateTimeFormat().resolvedOptions().timeZone) : openAt;
+  const closingLocal = isClient ? closeAt.setZone(Intl.DateTimeFormat().resolvedOptions().timeZone) : closeAt;
 
   const subline =
     state === "PRE_OPEN"
@@ -86,13 +89,13 @@ export default function Countdown() {
             { label: "HOURS", val: fmtTwo(hours), prev: prevValues.hours },
             { label: "MINUTES", val: fmtTwo(minutes), prev: prevValues.minutes },
             { label: "SECONDS", val: fmtTwo(seconds), prev: prevValues.seconds },
-          ].map(({ label, val, prev }) => (
+          ].map(({ label, val, prev }, index) => (
             <div
               key={label}
               className="glass-container orange-glow digit-flip grid min-w-[120px] md:min-w-[140px] lg:min-w-[160px] place-items-center rounded-3xl
                          px-6 py-8 md:px-8 md:py-10 lg:px-10 lg:py-12
                          hover:scale-105 transition-transform duration-300"
-              style={{ animationDelay: `${Math.random() * 2}s` }}
+              style={{ animationDelay: `${index * 0.2}s` }}
               aria-label={`${val} ${label.toLowerCase()} remaining`}
             >
               <div className="text-white font-black tabular-nums text-glow
@@ -148,12 +151,12 @@ export default function Countdown() {
           <div className="text-base md:text-lg">
             <span className="text-radr-orange font-semibold">Opening:</span> Sep 23, 2025 12:00 PM ET
             <span className="mx-4 text-white/50">•</span>
-            <span className="text-white/80">Your local:</span> {openingLocal.toFormat("LLL d, yyyy h:mm a ZZZZ")}
+            <span className="text-white/80">Your local:</span> {isClient ? openingLocal.toFormat("LLL d, yyyy h:mm a ZZZZ") : "Loading..."}
           </div>
           <div className="text-base md:text-lg mt-2">
             <span className="text-radr-orange font-semibold">Closing:</span> Sep 30, 2025 12:00 PM ET
             <span className="mx-4 text-white/50">•</span>
-            <span className="text-white/80">Your local:</span> {closingLocal.toFormat("LLL d, yyyy h:mm a ZZZZ")}
+            <span className="text-white/80">Your local:</span> {isClient ? closingLocal.toFormat("LLL d, yyyy h:mm a ZZZZ") : "Loading..."}
           </div>
         </div>
       </div>
